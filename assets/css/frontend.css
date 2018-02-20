@@ -1,0 +1,76 @@
+.envato-affiliate-default {
+  border: 1px solid #EFEFEF;
+  background: #FFFFFF;
+  margin: 0 0 20px;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+}
+.envato-affiliate-default--list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  display: block;
+  white-space: nowrap;
+}
+.envato-affiliate-default--list-item {
+  margin: 0;
+  padding: 2px;
+  display: inline-block;
+  height: 106px;
+}
+.envato-affiliate-default--link {
+  margin: 0;
+  padding: 0;
+  display: block;
+  text-decoration: none;
+  box-shadow: none;
+}
+.envato-affiliate-default--link:hover {
+  text-decoration: none;
+}
+.envato-affiliate-default--image {
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  height: 102px;
+}
+.envato-affiliate-flex {
+  border: 1px solid #EFEFEF;
+  background: #FFFFFF;
+  margin: 0 0 20px;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1;
+}
+.envato-affiliate-flex--list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  flex-direction: row;
+}
+.envato-affiliate-flex--list-item {
+  margin: 0;
+  padding: 2px;
+  width: 50%;
+}
+.envato-affiliate-flex--link {
+  margin: 0;
+  padding: 0;
+  display: block;
+  text-decoration: none;
+  box-shadow: none !important;
+}
+.envato-affiliate-flex--link:hover {
+  text-decoration: none;
+}
+.envato-affiliate-flex--image {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+}
