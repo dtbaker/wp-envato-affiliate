@@ -29,25 +29,59 @@ class EnvatoAffiliate{
 				'help' => 'The username added to URL query strings, e.g. `?ref=dtbaker`',
 				'default' => 'dtbaker',
 			),
+			'ir_market_url' => array(
+				'title' => 'Impact Radius Market',
+				'help' => 'Your personal tracking link available from `https://member.impactradius.com/secure/mediapartner/campaigns/mp-manage-active-ios-flow.ihtml`',
+				'default' => 'http://1.envato.market/c/370092/275988/4415',
+			),
+			'ir_elements_url' => array(
+				'title' => 'Impact Radius Elements',
+				'help' => 'Your personal tracking link available from `https://member.impactradius.com/secure/mediapartner/campaigns/mp-manage-active-ios-flow.ihtml`',
+				'default' => 'http://1.envato.market/c/370092/298927/4662',
+			),
 			'fallback_search' => array(
 				'title' => 'Default Search Term',
 				'help' => 'If we cannot find results on the Envato API, we fall back to this default search term.',
 				'default' => 'WordPress Themes',
 			),
+
 			'marketplace' => array(
 				'title' => 'Default Marketplace',
 				'help' => 'This is the marketplace we search for API results, e.g. `themeforest.net` or `codecanyon.net`',
+				'type' => 'select',
 				'default' => 'themeforest.net',
+				'options' => array(
+					'themeforest.net' => 'ThemeForest',
+					'codecanyon.net' => 'CodeCanyon',
+					'graphicriver.net' => 'GraphicRiver',
+					'videohive.net' => 'VideoHive',
+					'audiojungle.net' => 'AudioJungle',
+					'3docean.net' => '3DOcean',
+					'photodune.net' => 'PhotoDune',
+					'elements.envato.com' => 'Elements',
+				),
 			),
 			'category' => array(
 				'title' => 'Default Category',
-				'help' => 'This is the category we search for API results, e.g. `wordpress` or `php-scripts`',
-				'default' => 'wordpress',
+				'help' => 'This is the category we search for API results, e.g. `wordpress` or `php-scripts` or `all`',
+				'default' => 'all',
 			),
 			'layout' => array(
 				'title' => 'Default CSS Class',
-				'help' => 'This is the CSS class that we add to the API output. Use this to style the item output from your theme CSS code. See sample CSS for more information.',
+				'help' => 'This is the CSS class that we add to the API output. Use this to style the item output from your theme CSS code. See sample CSS for more information. The values here are `default`, `row`, and `flex`.',
 				'default' => 'default',
+				'type' => 'select',
+                'options' => array(
+                    'default' => 'Default Scrolling Row',
+                    'row' => 'Flex Row (for page top)',
+                    'flex' => 'Flex Column (for sidebar)'
+                ),
+			),
+			'item_count' => array(
+				'title' => 'Item Count',
+				'help' => 'How many items should be returned in the API result',
+				'default' => '10',
+                'type' => 'text',
 			),
 			'cache_timeout' => array(
 				'title' => 'Cache Timeout',
@@ -58,17 +92,27 @@ class EnvatoAffiliate{
 			'default_css' => array(
 				'title' => 'Load default CSS',
 				'help' => 'Yes or No. If set to `Yes` then the default `frontend.css` styles will be loaded. <br/>You should probably copy these styles into your theme and change this setting to `No`.',
-				'default' => 'Yes',
+				'default' => 'yes',
+				'type' => 'select',
+				'options' => array(
+					'yes' => 'Yes include default CSS',
+					'no' => 'No do not include CSS',
+				),
 			),
 			'debug' => array(
 				'title' => 'Show Debug Messages',
 				'help' => 'Yes or No. Shows debug messages when set to `Yes`.',
-				'default' => 'No',
+				'default' => 'no',
+				'type' => 'select',
+				'options' => array(
+					'yes' => 'Yes, show debug messages',
+					'no' => 'No, hide debug messages',
+				),
 			),
 		);
 		$saved_settings = get_option('envato_affiliate_options');
 		foreach($this->settings as $key => $options ){
-			$this->settings[$key]['value'] = $saved_settings && is_array($saved_settings) && !empty($saved_settings[ENVATO_AFFILIATE_SLUG . 'setting-' . $key]) ? $saved_settings[ENVATO_AFFILIATE_SLUG . 'setting-' . $key] : $options['default'];
+			$this->settings[$key]['value'] = $saved_settings && is_array($saved_settings) && isset($saved_settings[ENVATO_AFFILIATE_SLUG . 'setting-' . $key]) ? $saved_settings[ENVATO_AFFILIATE_SLUG . 'setting-' . $key] : $options['default'];
 		}
 
 	}
@@ -167,15 +211,28 @@ class EnvatoAffiliate{
 
             $api = EnvatoAffiliateAPI::get_instance();
 
-            $api_result = $api->call_api( 'v1/discovery/search/search/item', [
-	            'term' => $search_term,
-	            'site' => $settings['marketplace'],
-	            'category' => $settings['category'],
-	            'page' => 1,
-	            'page_size' => 20,
-	            'sort_by' => 'rating',
-	            'sort_direction' => 'desc',
-            ], $custom_settings );
+            if( !empty($settings['marketplace']) && $settings['marketplace'] == 'elements.envato.com' ){
+	            $api_result = $api->call_elements_api( 'v1/items.json', [
+		            'searchTerms'   => $search_term,
+		            'type'          => !empty($settings['category']) && strtolower( $settings['category'] ) !== 'all' ? $settings['category'] : '',
+                    'sortBy'        => 'popular', // relevant or latest
+	            ], $custom_settings );
+	            // Item count happens separately to API request.
+	            $item_count = !empty($settings['item_count']) && (int)$settings['item_count'] > 0 ? $settings['item_count'] : 20;
+	            if( $api_result && !empty($api_result['matches']) && count($api_result['matches']) > $item_count){
+	                $api_result['matches'] = array_slice( $api_result['matches'], 0, $item_count);
+                }
+            }else {
+	            $api_result = $api->call_market_api( 'v1/discovery/search/search/item', [
+		            'term'           => $search_term,
+		            'site'           => !empty($settings['marketplace']) ? $settings['marketplace'] : '',
+		            'category'       => !empty($settings['category']) && strtolower( $settings['category'] ) !== 'all' ? $settings['category'] : '',
+		            'page'           => 1,
+		            'page_size'      => !empty($settings['item_count']) && (int)$settings['item_count'] > 0 ? $settings['item_count'] : 20,
+		            'sort_by'        => 'rating',
+		            'sort_direction' => 'desc',
+	            ], $custom_settings );
+            }
 
 	        $items = array();
             if( !$api_result || !is_array( $api_result ) || empty($api_result['matches']) ){
@@ -274,8 +331,33 @@ class EnvatoAffiliate{
 		if (preg_match('/^setting_field_cb_([a-z_]+)/', $name, $matches)) {
 			$key = $matches[1];
 			if( isset($this->settings[$key])){
+
+				switch($this->settings[$key]['type']){
+					case 'select':
+						?>
+                        <select name="envato_affiliate_options[<?php echo esc_attr(ENVATO_AFFILIATE_SLUG . 'setting-' . $key);?>]">
+                            <option value=""> - </option>
+	                        <?php foreach($this->settings[$key]['options'] as $option_key=>$option_val){
+	                            ?>
+                                <option value="<?php echo esc_attr($option_key); ?>"<?php selected( $this->settings[$key]['value'], $option_key, true );?>><?php echo esc_attr($option_val);?></option>
+	                        <?php } ?>
+                        </select>
+						<?php
+						break;
+					case 'password':
+						?>
+                        <input type="password" name="envato_affiliate_options[<?php echo esc_attr(ENVATO_AFFILIATE_SLUG . 'setting-' . $key);?>]" value="<?php echo esc_attr( $this->settings[$key]['value'] ); ?>">
+						<?php
+						break;
+					case 'text':
+                    default:
+						?>
+                        <input type="text" name="envato_affiliate_options[<?php echo esc_attr(ENVATO_AFFILIATE_SLUG . 'setting-' . $key);?>]" value="<?php echo esc_attr( $this->settings[$key]['value'] ); ?>">
+						<?php
+						break;
+				}
+
 				?>
-				<input type="<?php echo !empty($this->settings[$key]['type']) ? $this->settings[$key]['type'] : 'text';?>" name="envato_affiliate_options[<?php echo esc_attr(ENVATO_AFFILIATE_SLUG . 'setting-' . $key);?>]" value="<?php echo esc_attr( $this->settings[$key]['value'] ); ?>">
 				<br/>
 				<em><?php echo $this->settings[$key]['help'];?></em>
 				<?php
@@ -296,10 +378,29 @@ class EnvatoAffiliate{
 
 	public function debug($message){
 		$settings = $this->get_settings( );
-		if(strtolower($settings['debug']) == 'yes') {
+		if(strtolower($settings['debug']) == 'yes' && is_user_logged_in()) {
 			echo '<div class="envato-affiliate-debug">' . esc_html( $message ) . '</div>';
 		}
     }
 
+    public function affiliate_link( $original_url, $settings ) {
+
+	    $new_url = $original_url;
+	    if ( strpos( $original_url, 'elements.envato.com' ) ) {
+		    // we want to use the elements IR code here.
+		    if ( ! empty( $settings['ir_elements_url'] ) ) {
+			    $new_url = $settings['ir_elements_url'] . '?u=' . urlencode( $original_url );
+		    }
+	    } else {
+
+		    if ( ! empty( $settings['ir_market_url'] ) ) {
+			    $new_url = $settings['ir_market_url'] . '?u=' . urlencode( $original_url );
+		    } else if ( ! empty( $settings['affiliate_username'] ) ) {
+			    $new_url = $original_url . '?ref=' . $settings['affiliate_username'];
+		    }
+	    }
+
+	    return $new_url;
+    }
 
 }

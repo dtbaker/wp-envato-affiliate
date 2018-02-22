@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || die;
 		<pre>[envato_affiliate<?php
 			$settings = EnvatoAffiliate::get_instance()->get_settings();
 			foreach($settings as $key=>$val){
-				if( !in_array( $key, [ 'api_token', 'default_css' ] ) ){
+				if( !in_array( $key, [ 'api_token', 'default_css', 'debug' ] ) ){
 					echo ' '.$key.'="' . esc_attr($val) . '"';
 				}
 			}
@@ -32,7 +32,7 @@ if( class_exists( "EnvatoAffiliate" ) ){
 	EnvatoAffiliate::get_instance()->show_results( array(
 		"search_term" => "PUT YOUR CUSTOM SEARCH TERM HERE, OR LEAVE EMPTY",' . "\n");
 			foreach($settings as $key=>$val){
-				if( !in_array( $key, [ 'api_token', 'default_css' ] ) ){
+				if( !in_array( $key, [ 'api_token', 'default_css', 'debug' ] ) ){
 					echo ' 		"'.$key.'" => "' . esc_attr($val) . '",' . "\n";
 				}
 			}

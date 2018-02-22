@@ -4,9 +4,9 @@
  * Description: Affiliate integration options for Envato
  * Plugin URI: https://envato.com/
  * Author: dtbaker
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author URI: https://dtbaker.net/
- * GitHub Plugin URI: https://github.com/envato/wp-envato-affiliate
+ * GitHub Plugin URI: https://github.com/dtbaker/wp-envato-affiliate
  * Requires at least:   4.9.4
  * Tested up to:        4.9.4
  * Text Domain: envato-affiliate
@@ -16,7 +16,7 @@
 defined( 'ABSPATH' ) || die;
 
 /* Set plugin version constant. */
-define( 'ENVATO_AFFILIATE_VERSION', '1.0.1' );
+define( 'ENVATO_AFFILIATE_VERSION', '1.0.2' );
 
 /* Debug output control. */
 define( 'ENVATO_AFFILIATE_DEBUG_OUTPUT', 0 );

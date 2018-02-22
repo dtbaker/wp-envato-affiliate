@@ -18,6 +18,7 @@
     padding:2px;
     display:inline-block;
     height: 106px;
+    text-align: center;
   }
   &--link{
     margin:0;
@@ -34,6 +35,38 @@
     padding:0;
     width: 200px;
     height: 102px;
+  }
+  &--image.--size-thumb{
+    width: 80px;
+    height: 80px;
+  }
+}
+
+.envato-affiliate-row{
+  padding: 0 0 10px;
+  margin: 0;
+  &--list{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    flex-direction: row;
+    margin-left: -6px;
+    margin-right: -6px;
+  }
+  &--list-item{
+    display: list-item;
+    margin: 4px 8px;
+    flex-basis: ~"calc(16.666% - 16px)";
+    overflow: hidden;
+    text-align: center;
+  }
+  &--image{
+    width: 100%;
+    height: auto;
+  }
+  &--image.--size-thumb{
+    width: 80px;
+    height: 80px;
   }
 }
 
@@ -57,6 +90,7 @@
     margin:0;
     padding:2px;
     width: 50%;
+    text-align: center;
   }
   &--link{
     margin:0;
@@ -73,5 +107,9 @@
     padding:0;
     width: 100%;
     height: auto;
+  }
+  &--image.--size-thumb{
+    width: 80px;
+    height: 80px;
   }
 }
